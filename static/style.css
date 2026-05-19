@@ -1,0 +1,302 @@
+/* ── Reset ─────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ── Tokens ────────────────────────────────────────── */
+:root {
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", sans-serif;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-pill: 99px;
+
+  --bg-page:    #F5F4F1;
+  --bg-surface: #FFFFFF;
+  --bg-muted:   #F0EEE9;
+
+  --border:       rgba(0, 0, 0, 0.10);
+  --border-light: rgba(0, 0, 0, 0.06);
+
+  --text-primary:   #1A1A18;
+  --text-secondary: #5F5E5A;
+  --text-tertiary:  #9A9894;
+
+  --green:  #1D9E75;
+  --amber:  #BA7517;
+  --red:    #E24B4A;
+  --red-bg: rgba(226, 75, 74, 0.10);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-page:    #111110;
+    --bg-surface: #1C1C1A;
+    --bg-muted:   #252523;
+
+    --border:       rgba(255, 255, 255, 0.10);
+    --border-light: rgba(255, 255, 255, 0.06);
+
+    --text-primary:   #F0EEE9;
+    --text-secondary: #A8A7A2;
+    --text-tertiary:  #66655F;
+
+    --red-bg: rgba(226, 75, 74, 0.15);
+  }
+}
+
+/* ── Base ──────────────────────────────────────────── */
+html, body {
+  height: 100%;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  background: var(--bg-page);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Shell ─────────────────────────────────────────── */
+.app-shell {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 16px;
+  padding: 20px;
+  min-height: 100vh;
+  align-items: start;
+}
+
+@media (max-width: 860px) {
+  .app-shell {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Monitor (left column) ─────────────────────────── */
+.monitor {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ── Video wrap ────────────────────────────────────── */
+.video-wrap {
+  position: relative;
+  background: #0A0A09;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+  border: 0.5px solid var(--border);
+}
+
+.video-wrap video,
+.video-wrap canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ── Risk overlay badge ────────────────────────────── */
+.risk-overlay {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  padding: 5px 13px;
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: var(--red);
+  color: #fff;
+  display: none;
+  pointer-events: none;
+}
+
+.risk-overlay.show { display: block; }
+
+/* ── Toolbar ───────────────────────────────────────── */
+.toolbar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.toolbar button {
+  flex: 1;
+  min-width: 110px;
+  padding: 9px 14px;
+  border-radius: var(--radius-md);
+  border: 0.5px solid var(--border);
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  font-size: 13px;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: background 0.12s, opacity 0.12s;
+  white-space: nowrap;
+}
+
+.toolbar button:hover:not(:disabled) {
+  background: var(--bg-muted);
+}
+
+.toolbar button:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.toolbar button:disabled {
+  opacity: 0.38;
+  cursor: not-allowed;
+}
+
+/* Primary variant — Start Camera */
+#startBtn {
+  background: var(--text-primary);
+  color: var(--bg-surface);
+  border-color: transparent;
+}
+
+#startBtn:hover:not(:disabled) {
+  opacity: 0.86;
+  background: var(--text-primary);
+}
+
+/* ── Panel (right column) ──────────────────────────── */
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.panel h1 {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-primary);
+  padding: 0 2px;
+}
+
+/* ── Card ──────────────────────────────────────────── */
+.card,
+.alerts,
+.objects {
+  background: var(--bg-surface);
+  border: 0.5px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  padding: 14px 16px;
+}
+
+.alerts h2,
+.objects h2 {
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-tertiary);
+  margin-bottom: 10px;
+}
+
+/* ── Status grid ───────────────────────────────────── */
+.status-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.status-grid > div {
+  background: var(--bg-muted);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+}
+
+.status-grid > div span {
+  display: block;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-tertiary);
+  margin-bottom: 4px;
+}
+
+.status-grid > div strong {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+/* ── Risk colours ──────────────────────────────────── */
+.risk-low  { color: var(--green) !important; }
+.risk-med  { color: var(--amber) !important; }
+.risk-high { color: var(--red)   !important; }
+
+/* ── Alert message ─────────────────────────────────── */
+#alertMessage {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin-bottom: 8px;
+}
+
+/* ── Reason list ───────────────────────────────────── */
+#reasonList {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+#reasonList li {
+  font-size: 12px;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+#reasonList li::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--red);
+  flex-shrink: 0;
+}
+
+/* ── Object list ───────────────────────────────────── */
+#objectList {
+  font-size: 13px;
+  color: var(--text-tertiary);
+  line-height: 1.55;
+}
+
+/* Detected object pills (add via JS) */
+.obj-pill {
+  display: inline-block;
+  padding: 3px 9px;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  background: var(--bg-muted);
+  border: 0.5px solid var(--border-light);
+  color: var(--text-secondary);
+  margin: 3px 3px 0 0;
+}
+
+/* ── Live indicator (add via JS when active) ───────── */
+.live-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--green);
+  margin-right: 4px;
+  vertical-align: middle;
+  animation: pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Infant Safety Monitor</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <main class="app-shell">
+    <section class="monitor">
+      <div class="video-wrap" id="videoWrap">
+        <video id="video" autoplay playsinline muted></video>
+        <canvas id="overlay"></canvas>
+        <div class="risk-overlay" id="riskOverlay">HIGH RISK</div>
+      </div>
+
+      <div class="toolbar">
+        <button id="startBtn">Start Camera</button>
+        <button id="resetBtn">Reset</button>
+      </div>
+    </section>
+
+    <aside class="panel">
+      <h1>Infant Safety Monitor</h1>
+      <div class="status-grid">
+        <div>
+          <span>Tracking</span>
+          <strong id="trackingStatus">Idle</strong>
+        </div>
+        <div>
+          <span>Risk</span>
+          <strong id="riskLevel" class="risk-low">LOW</strong>
+        </div>
+        <div>
+          <span>Fence</span>
+          <strong id="fenceStatus">Ready</strong>
+        </div>
+        <div>
+          <span>Objects</span>
+          <strong id="objectCount">0</strong>
+        </div>
+      </div>
+
+      <section class="alerts">
+        <h2>Alerts</h2>
+        <p id="alertMessage">Start the camera, select the infant once, then monitor.</p>
+        <ul id="reasonList"></ul>
+      </section>
+
+      <section class="objects">
+        <h2>Surroundings</h2>
+        <div id="objectList" class="object-list">Object analysis activates after a fence breach.</div>
+      </section>
+    </aside>
+  </main>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
