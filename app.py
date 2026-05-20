@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import base64
+import os
 from typing import Any
 
 import cv2
@@ -18,11 +19,11 @@ from utils.tracker import InfantTracker
 
 app = Flask(__name__)
 
-detector = InfantDetector()
-tracker = InfantTracker()
 geofence = Geofence()
-pose_estimator = PoseEstimator()
-object_detector = SurroundingsObjectDetector()
+detector: InfantDetector | None = None
+tracker: InfantTracker | None = None
+pose_estimator: PoseEstimator | None = None
+object_detector: SurroundingsObjectDetector | None = None
 risk_analyzer = RiskAnalyzer()
 alert_manager = AlertManager()
 frame_counter = 0
@@ -40,6 +41,34 @@ def decode_frame(data_url: str) -> np.ndarray:
     return frame
 
 
+def get_detector() -> InfantDetector:
+    global detector
+    if detector is None:
+        detector = InfantDetector()
+    return detector
+
+
+def get_tracker() -> InfantTracker:
+    global tracker
+    if tracker is None:
+        tracker = InfantTracker()
+    return tracker
+
+
+def get_pose_estimator() -> PoseEstimator:
+    global pose_estimator
+    if pose_estimator is None:
+        pose_estimator = PoseEstimator()
+    return pose_estimator
+
+
+def get_object_detector() -> SurroundingsObjectDetector:
+    global object_detector
+    if object_detector is None:
+        object_detector = SurroundingsObjectDetector()
+    return object_detector
+
+
 @app.get("/")
 def index() -> str:
     return render_template("index.html")
@@ -49,7 +78,8 @@ def index() -> str:
 def reset() -> Any:
     global frame_counter, cached_objects
 
-    tracker.reset()
+    if tracker is not None:
+        tracker.reset()
     risk_analyzer.reset()
     alert_manager.clear()
     frame_counter = 0
@@ -66,8 +96,11 @@ def process_frame() -> Any:
     selection = payload.get("selection")
     fence_payload = payload.get("geofence")
 
-    detections = detector.detect_people(frame)
-    tracked_infant = tracker.update(frame, detections, selection)
+    active_detector = get_detector()
+    active_tracker = get_tracker()
+
+    detections = active_detector.detect_people(frame)
+    tracked_infant = active_tracker.update(frame, detections, selection)
     fence = geofence.normalize(fence_payload, frame.shape[1], frame.shape[0])
 
     inside_fence = True
@@ -81,10 +114,10 @@ def process_frame() -> Any:
         inside_fence = geofence.contains_bbox_centroid(fence, tracked_infant["bbox"])
         fence_breached = risk_analyzer.update_fence_state(inside_fence)
 
-        pose = pose_estimator.estimate(frame, tracked_infant["bbox"])
+        pose = get_pose_estimator().estimate(frame, tracked_infant["bbox"])
         frame_counter += 1
         if frame_counter % 3 == 0 or fence_breached or not cached_objects:
-            cached_objects = object_detector.detect_nearby(
+            cached_objects = get_object_detector().detect_nearby(
                 frame,
                 tracked_infant["bbox"],
                 include_unknown=fence_breached,
@@ -118,10 +151,11 @@ def process_frame() -> Any:
             "objects": objects,
             "risk": risk,
             "alert": alert,
-            "tracking": tracker.status(),
+            "tracking": active_tracker.status(),
         }
     )
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True, threaded=True)
+    port = int(os.environ.get("PORT", "5000"))
+    app.run(host="0.0.0.0", port=port, debug=False, threaded=True, use_reloader=False)
